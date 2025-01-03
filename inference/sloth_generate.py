@@ -2,10 +2,16 @@ from unsloth import FastLanguageModel
 import torch
 import html
 import re
+from pathlib import Path
+
+
+model_name = "course_description_lora"
+dir_path = Path(__file__).parent
+models_dir = dir_path / "models"
 
 # Load the model and tokenizer
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "course_description_lora",
+    model_name = str(models_dir / model_name),
     max_seq_length = 256,
     dtype = None,
     load_in_4bit = True,
