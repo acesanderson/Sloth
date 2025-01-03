@@ -38,7 +38,7 @@ course_descriptions = [clean_html_text(zap_instructors(course.metadata['Course D
 dataset = Dataset.from_dict({"title": course_titles, "description": course_descriptions})
 
 # Limit to 1,000 for testing purposes
-dataset = dataset.select(range(1000))
+# dataset = dataset.select(range(1000))
 
 # Apply splits
 splits = dataset.train_test_split(test_size=0.2, seed=42)
