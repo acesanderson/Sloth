@@ -1,13 +1,8 @@
-"""
-Training dataset:
-- "Look at this description of a LinkedIn Learnign video course:\n<description>{{Course Name}}: {{Course Description}}</description>\nCreate a descriptive Table of Contents for the course." -> course.TOC_verbose
-"""
-
 from Kramer.database.MongoDB_CRUD import get_all_courses_sync
 from sloth.training.train_sloth import train_sloth
 import html
-from random import choice
 
+model_name = "tocs_to_intro_video"
 
 def clean_html_text(text):
     try:
@@ -62,7 +57,7 @@ if __name__ == "__main__":
     {}"""
 
     model, tokenizer = train_sloth(
-        model_name="titles_to_tocs",
+        model_name=model_name,
         prompt_template=course_prompt,
         data={"inputs": inputs, "outputs": outputs},
     )
