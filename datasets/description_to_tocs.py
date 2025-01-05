@@ -48,7 +48,6 @@ if __name__ == "__main__":
     {}"""
 
     model, tokenizer = train_sloth(
-        base_model="unsloth/Meta-Llama-3.1-8B",
         model_name="descriptions_to_tocs",
         prompt_template=course_prompt,
         data={"inputs": inputs, "outputs": outputs},

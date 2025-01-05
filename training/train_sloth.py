@@ -8,17 +8,40 @@ from datasets import Dataset, DatasetDict
 from transformers import TrainingArguments
 from trl import SFTTrainer
 from pathlib import Path
+import socket
 
 # Our models directory
 dir_path = Path(__file__).parent
 models_dir = dir_path.parent / "models"
 
+# Configs
+## Get hostname
+hostname = socket.gethostname()
+configs = {}
+if hostname == "Botvinnik":
+    # configs['base_model'] = "unsloth/mistral-7b" 
+    # configs['base_model'] = "unsloth/Phi-3-mini-4k-instruct-bnb-4bit"
+    configs['base_model'] = "unsloth/llama-2-7b"
+    configs['model_max_seq_length'] = 128 
+    configs['per_device_train_batch_size'] = 1
+    configs['per_device_eval_batch_size'] = 1
+    configs['gradient_accumulation_steps'] = 8
+    configs['training_max_seq_length'] = 256
+    configs['gradient_checkpointing'] = True
+if hostname == "Caruana":
+    configs['base_model']="unsloth/Meta-Llama-3.1-8B"
+    configs['model_max_seq_length'] = 512
+    configs['per_device_train_batch_size'] = 4
+    configs['per_device_eval_batch_size'] = 4
+    configs['gradient_accumulation_steps'] = 4
+    configs['training_max_seq_length'] = 1024
+    configs['gradient_checkpointing'] = False
+
 
 # Training function -- we'll want to set this apart from dataset logic, in the training directory
-def train_sloth(base_model: str, model_name: str, prompt_template: str, data: dict):
+def train_sloth(model_name: str, prompt_template: str, data: dict):
     """
     Fine tune a model on a given dataset using the unsloth library.
-    base_model: str - The name of the base model to fine tune (default is "unsloth/Meta-Llama-3.1-8B")
     model_name: str - The name of the fine tuned model to save (this is saved in sloth/models)
     prompt_template: str - The prompt template to use for fine tuning
     data: dict - The data to use for fine tuning. The dict should have two keys: "inputs" and "outputs"
@@ -46,8 +69,8 @@ def train_sloth(base_model: str, model_name: str, prompt_template: str, data: di
 
     # Model initialization remains the same as in the original script
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=base_model,
-        max_seq_length=512,  # Reduced since course descriptions are typically shorter
+        model_name=configs['base_model'],
+        max_seq_length=configs['model_max_seq_length'],  # Reduced since course descriptions are typically shorter
         dtype=None,
         load_in_4bit=True,
     )
@@ -97,13 +120,13 @@ def train_sloth(base_model: str, model_name: str, prompt_template: str, data: di
         train_dataset=train_formatted,
         eval_dataset=val_formatted,  # Added validation dataset
         dataset_text_field="text",
-        max_seq_length=1024,
+        max_seq_length=configs['training_max_seq_length'],
         dataset_num_proc=2,
         packing=False,
         args=TrainingArguments(
-            per_device_train_batch_size=4,
-            per_device_eval_batch_size=4,  # Added eval batch size
-            gradient_accumulation_steps=4,
+            per_device_train_batch_size=configs['per_device_train_batch_size'],
+            per_device_eval_batch_size=configs['per_device_eval_batch_size'],  # Added eval batch size
+            gradient_accumulation_steps=configs['gradient_accumulation_steps'],
             warmup_steps=100,
             num_train_epochs=5,  # 3 for the courrse title task, 5 for this one
             learning_rate=2e-4,
@@ -119,6 +142,7 @@ def train_sloth(base_model: str, model_name: str, prompt_template: str, data: di
             lr_scheduler_type="linear",
             seed=3407,
             output_dir=str(model_path),
+            gradient_checkpointing = configs['gradient_checkpointing'],
         ),
     )
 
