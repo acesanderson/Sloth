@@ -143,6 +143,7 @@ def train_sloth(model_name: str, prompt_template: str, data: dict):
             seed=3407,
             output_dir=str(model_path),
             gradient_checkpointing = configs['gradient_checkpointing'],
+            resume_from_checkpoint=True,
         ),
     )
 
