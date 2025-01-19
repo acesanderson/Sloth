@@ -20,8 +20,8 @@ hostname = socket.gethostname()
 configs = {}
 if hostname == "Botvinnik":
     # configs['base_model'] = "unsloth/mistral-7b" 
-    # configs['base_model'] = "unsloth/Phi-3-mini-4k-instruct-bnb-4bit"
-    configs['base_model'] = "unsloth/llama-2-7b"
+    configs['base_model'] = "unsloth/Phi-3-mini-4k-instruct-bnb-4bit"
+    # configs['base_model'] = "unsloth/llama-2-7b"
     configs['model_max_seq_length'] = 128 
     configs['per_device_train_batch_size'] = 1
     configs['per_device_eval_batch_size'] = 1
@@ -29,7 +29,8 @@ if hostname == "Botvinnik":
     configs['training_max_seq_length'] = 256
     configs['gradient_checkpointing'] = True
 if hostname == "Caruana":
-    configs['base_model']="unsloth/Meta-Llama-3.1-8B"
+    configs['base_model'] = "unsloth/Meta-Llama-3.1-70B-bnb-4bit"
+    # configs['base_model']="unsloth/Meta-Llama-3.1-8B"
     configs['model_max_seq_length'] = 512
     configs['per_device_train_batch_size'] = 4
     configs['per_device_eval_batch_size'] = 4
@@ -49,7 +50,7 @@ def train_sloth(model_name: str, prompt_template: str, data: dict):
     model_path = models_dir / model_name
     dataset = Dataset.from_dict(data)
     # Limit to 1,000 for testing purposes
-    # dataset = dataset.select(range(1000))
+    # dataset = dataset.select(range(80))
     # Apply splits
     splits = dataset.train_test_split(test_size=0.2, seed=42)
     test_valid = splits["test"].train_test_split(test_size=0.5, seed=42)
@@ -161,7 +162,7 @@ def train_sloth(model_name: str, prompt_template: str, data: dict):
 
     for input in test_examples["inputs"]:
         print("\nOriginal Input:", input)
-        output = query_model(input, model, tokenizer)
+        output = query_model(input = input, prompt_template = prompt_template, model = model, tokenizer = tokenizer)
         print("\nGenerated Output:", output)
         print("\n" + "=" * 80)
 
@@ -170,8 +171,8 @@ def train_sloth(model_name: str, prompt_template: str, data: dict):
 
 
 # Inference helper function
-def query_model(input, model, tokenizer):
-    prompt = course_prompt.format(input, "")
+def query_model(input, prompt_template, model, tokenizer):
+    prompt = prompt_template.format(input, "")
     inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
 
     outputs = model.generate(

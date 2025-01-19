@@ -36,7 +36,7 @@ if __name__ == "__main__":
     {}"""
 
     model, tokenizer = train_sloth(
-        model_name="titles_to_tocs",
+        model_name="titles_to_tocs_70b",
         prompt_template=course_prompt,
         data={"inputs": inputs, "outputs": outputs},
     )

@@ -24,8 +24,16 @@ if __name__ == "__main__":
     outputs = [clean_html_text(course.course_TOC_verbose) for course in courses]
     assert len(inputs) == len(outputs)
     dataset = list(zip(inputs, outputs))
-    dataset = [{"prompt": dataset[0], "completion": dataset[1]}]
+    dataset = [{"prompt": datum[0], "completion": datum[1]} for datum in dataset]
+    dataset = [json.dumps(datum) for datum in dataset]
     cutoff = int(0.9 * len(dataset))
     train_set = dataset[:cutoff]
     valid_set = dataset[: len(dataset) - cutoff]
-    print(valid_set)
+    # save train_set as jsonl
+    with open("train.jsonl", "w") as f:
+        for datum in train_set:
+            f.write(datum + "\n")
+    # save valid_set as jsonl
+    with open("valid.jsonl", "w") as f:
+        for datum in valid_set:
+            f.write(datum + "\n")

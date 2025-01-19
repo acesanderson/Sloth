@@ -47,6 +47,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a Table of Contents for a LinkedIn Learning video course.")
     parser.add_argument("course_title", type=str, help="The title and description of the course.")
     args = parser.parse_args()
-    generated_TOC = generate_TOC_from_title(args.course_title_and_description, model, tokenizer)
+    generated_TOC = generate_TOC_from_title(args.course_title, model, tokenizer)
     print(generated_TOC)
     
