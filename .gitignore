@@ -1,3 +1,5 @@
 .sloth/
 .slothbot/
 models/
+MLX/model/*.*
+MLX/model

@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Inputs: course titles
     inputs = [clean_html_text(course.metadata["Course Name"]) for course in courses]
     # Outputs: course TOCs
-    outputs = [clean_html_text(course.course_TOC_verbose) for course in courses]
+    outputs = [clean_html_text(course.course_TOC) for course in courses]
     assert len(inputs) == len(outputs)
     dataset = list(zip(inputs, outputs))
     dataset = [{"prompt": datum[0], "completion": datum[1]} for datum in dataset]
